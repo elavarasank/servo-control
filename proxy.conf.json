@@ -1,0 +1,7 @@
+   {
+     "/api": {
+       "target": "https://ela-smarthome-automation.onrender.com",
+       "secure": true,
+       "changeOrigin": true
+     }
+   }
