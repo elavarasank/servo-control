@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, timer, switchMap, catchError, EMPTY, filter } from 'rxjs';
 import { ServoService } from './servo.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface LogEntry { time: string; text: string; ok: boolean; }
 
@@ -24,7 +25,31 @@ saveKey(e: Event) { this.servo.setKey((e.target as HTMLInputElement).value.trim(
   spinValid = computed(() => Number.isInteger(this.spins()) && this.spins() >= 1);
   angleValid = computed(() => Number.isInteger(this.angle()) && this.angle() >= 1 && this.angle() <= 180);
 
-  constructor() { this.checkStatus(); }
+  // new fields
+auto = signal(true);
+temperature = signal<number | null>(null);
+humidity = signal<number | null>(null);
+
+  constructor() { 
+    this.checkStatus(); 
+    timer(0, 5000).pipe(
+    filter(() => this.auto() && !!this.apiKey()),
+    switchMap(() => this.servo.temperature().pipe(catchError(() => EMPTY))),
+    takeUntilDestroyed(),
+  ).subscribe((r) => {
+    if (!r) return;
+    this.temperature.set(r.temperature);
+    this.humidity.set(r.humidity);
+    this.angle.set(Math.max(1, r.angle));
+    this.sentAngle.set(r.angle);      // moves the dial needle
+  });
+
+  }
+  toggleAuto() {
+  const next = !this.auto();
+  this.auto.set(next);
+  this.run(next ? 'Auto mode (DHT22)' : 'Manual mode', this.servo.setAuto(next));
+}
 
   checkStatus() {
     this.online.set('checking');

@@ -3,7 +3,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { timeout } from 'rxjs';
 import { API } from './api.config';
 import { environment } from '../environments/environment';
+export interface SensorReading {
+  temperature: number; humidity: number; angle: number; updatedAt: string; auto: boolean;
+}
 @Injectable({ providedIn: 'root' })
+
+
+
 export class ServoService {
   private http = inject(HttpClient);
   private base = environment.apiBase;
@@ -42,4 +48,13 @@ export class ServoService {
   stop() {
     return this.http.post<{ command: string }>(this.url('/stop'), {}, this.options()).pipe(timeout(API.timeoutMs));
   }
+
+
+  temperature() {
+  return this.http.get<SensorReading | null>(this.url('/temperature'), this.options()).pipe(timeout(API.timeoutMs));
+  }
+  setAuto(enabled: boolean) {
+  return this.http.post<{ auto: boolean }>(this.url(`/auto/${enabled}`), {}, this.options()).pipe(timeout(API.timeoutMs));
+  }
+
 }

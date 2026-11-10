@@ -2,6 +2,8 @@
   "name": "servo-control",
   "version": "0.0.0",
   "scripts": {
+    "start:local": "ng serve --proxy-config proxy.local.json",
+    "start:render": "ng serve --proxy-config proxy.render.json",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
@@ -19,6 +21,7 @@
     "@angular/router": "^22.2.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/ibm-plex-sans": "^5.3.0",
+    "cors": "^2.8.6",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

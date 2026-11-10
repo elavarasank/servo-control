@@ -45,15 +45,31 @@
     @if (!spinValid()) { <p class="hint">Enter a whole number, 1 or more.</p> }
   </section>
 
-  <section class="card">
-    <label for="angle">Angle (1–180)</label>
+<section class="card">
+  <label for="angle">
+    {{ auto() ? 'DHT22 temperature (°C) → servo angle' : 'Angle (1–180)' }}
+  </label>
+
+  @if (auto()) {
+    <div class="row">
+      <input id="angle" type="text" readonly
+             [value]="temperature() === null ? '' : temperature() + ' °C'"
+             placeholder="Waiting for sensor…" />
+      <button class="toggle" (click)="toggleAuto()">Go manual</button>
+    </div>
+    <p class="hint-ok">
+      Humidity: {{ humidity() ?? '—' }} % · Servo: {{ sentAngle() ?? '—' }}°
+    </p>
+  } @else {
     <div class="row">
       <input id="angle" type="number" min="1" max="180" step="1" inputmode="numeric"
              [value]="angle()" (input)="angle.set(readNum($event))" />
       <button class="primary" (click)="moveToAngle()" [disabled]="busy() || !angleValid()">Set angle</button>
     </div>
     @if (!angleValid()) { <p class="hint">Enter a whole number from 1 to 180.</p> }
-  </section>
+    <button class="toggle" (click)="toggleAuto()">Back to auto (DHT22)</button>
+  }
+</section>
 
    <section class="card">
      <label for="key">API key</label>
